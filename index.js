@@ -12,7 +12,7 @@ app.get('/', (req, res) => {
     res.send('Hello World!')
 })
 
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const uri = `mongodb+srv://${process.env.USER}:${process.env.PASS}@cluster0.3gkgi.mongodb.net/?retryWrites=true&w=majority`;
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
 
@@ -26,6 +26,18 @@ async function run() {
         app.post('/todos',async(req,res)=>{
             const todo = req.body;
             const result = await todoCollection.insertOne(todo);
+            res.send(result);
+        })
+        //get todos
+        app.get('/todos',async(req,res)=>{
+            const result = await todoCollection.find().toArray();
+            res.send(result);
+        })
+        //delete todo
+        app.delete('/todos/:id',async(req,res)=>{
+            const id = req.params.id;
+            const query = {_id:ObjectId(id)};
+            const result = await todoCollection.deleteOne(query);
             res.send(result);
         })
     }
